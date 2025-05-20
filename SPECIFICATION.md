@@ -25,7 +25,7 @@ This tool will offer simple, well-defined editing primitives and a traceable, re
 - Text buffer management (load, edit, insert, delete)
 - File tree scanning and folder expansion/collapse
 - Terminal command execution and output capture
-- Snapshot-based undo/redo functionality
+- Undo/redo functionality
 - TUI frontend using Textual (minimal, for debugging by humans)
 - Exposing simple agent tools (e.g., `replace_line`, `run_command`)
 - State export for inspection/debugging
@@ -35,7 +35,6 @@ This tool will offer simple, well-defined editing primitives and a traceable, re
 - Syntax highlighting beyond plain text
 - Human-oriented IDE features (minimap, folding, themes)
 - End-to-end agent orchestration
-- Fine-tuning tools
 
 ---
 
@@ -57,7 +56,7 @@ This tool will offer simple, well-defined editing primitives and a traceable, re
 - Fast startup (<1 second).
 - Robust against invalid operations (e.g., out-of-bounds edits).
 - Logs of all state changes for debugging and replay.
-- Fully operable in a Docker container.
+- Logs of all traces from LLMs
 
 ---
 
@@ -70,7 +69,7 @@ All core components must implement abstract base classes (interfaces) under `/in
 | `IEditorBuffer` | Manage lines of text loaded from a file. |
 | `IFileTree` | Represent and navigate file system structure. |
 | `ITerminalRunner` | Execute shell commands and return outputs. |
-| `IUndoManager` | Manage snapshots for undo/redo functionality. |
+| `IUndoManager` | Manage undo/redo functionality. |
 
 Each interface must be pure (only define behavior, no state).
 
@@ -83,7 +82,7 @@ Each interface must be pure (only define behavior, no state).
 | `EditorBuffer` | Concrete implementation of `IEditorBuffer`. |
 | `FileTreeModel` | Concrete implementation of `IFileTree`. |
 | `TerminalRunner` | Concrete implementation of `ITerminalRunner`. |
-| `SnapshotUndoManager` | Concrete implementation of `IUndoManager`. |
+| `ActionUndoManager` | Concrete implementation of `IUndoManager`. |
 | `IDEState` | Aggregate object that holds the current editor, file tree, terminal, and undo manager. |
 
 ---
@@ -118,6 +117,11 @@ Each snapshot must contain:
 - Terminal last command and output
 - Active file path
 
+### 7.2 Trace Model
+Each trace must contain:
+- Tool use (arguments + tool) OR
+- Text content (if it's a conversation -> thinking)
+- A list of traces will be the "save"
 ---
 
 ## 8. Dependencies
@@ -155,7 +159,6 @@ Minimum target: 90% unit test coverage.
 - `/tests` — Full test suite
 - `/examples` — Sample agent scripts
 - `README.md` — Full project description
-- Docker-ready deployment (`agent-native/docker`)
 
 ---
 
@@ -179,4 +182,3 @@ Minimum target: 90% unit test coverage.
 | Agents need more complex features later (e.g., syntax) | Design extensible interfaces |
 | Security vulnerabilities in terminal execution | Sandbox commands inside container |
 | Slow agent adoption | Focus on clean docs, good examples, simple demos |
-
